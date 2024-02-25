@@ -4,6 +4,7 @@ using ManageBooking.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ManageBooking.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240221044044_addTbVillaNumber")]
+    partial class addTbVillaNumber
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,53 +112,6 @@ namespace ManageBooking.Infrastructure.Migrations
                     b.HasIndex("VillaId");
 
                     b.ToTable("VillaNumbers");
-
-                    b.HasData(
-                        new
-                        {
-                            Villa_Number = 101,
-                            VillaId = 1
-                        },
-                        new
-                        {
-                            Villa_Number = 102,
-                            VillaId = 1
-                        },
-                        new
-                        {
-                            Villa_Number = 103,
-                            VillaId = 1
-                        },
-                        new
-                        {
-                            Villa_Number = 104,
-                            VillaId = 1
-                        },
-                        new
-                        {
-                            Villa_Number = 201,
-                            VillaId = 2
-                        },
-                        new
-                        {
-                            Villa_Number = 202,
-                            VillaId = 2
-                        },
-                        new
-                        {
-                            Villa_Number = 203,
-                            VillaId = 2
-                        },
-                        new
-                        {
-                            Villa_Number = 301,
-                            VillaId = 3
-                        },
-                        new
-                        {
-                            Villa_Number = 302,
-                            VillaId = 3
-                        });
                 });
 
             modelBuilder.Entity("ManageBooking.Domain.Entities.VillaNumber", b =>
