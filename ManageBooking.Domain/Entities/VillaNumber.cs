@@ -14,6 +14,7 @@ namespace ManageBooking.Domain.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Display(Name = "Villa Number")]
         public int Villa_Number { get; set; }
+        [ForeignKey("Villa")]
         public int VillaId { get; set; }
         [ValidateNever]
         public Villa Villa { get; set; }

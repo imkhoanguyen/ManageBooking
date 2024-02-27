@@ -30,7 +30,7 @@ namespace ManageBooking.Web.Controllers
                 _db.Villas.Add(obj);
                 _db.SaveChanges();
                 TempData["success"] = "Add success";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
             return View();
 
@@ -50,8 +50,8 @@ namespace ManageBooking.Web.Controllers
             {
                 _db.Update(obj);
                 _db.SaveChanges();
-                TempData["success"] = "Add success";
-                return RedirectToAction("Index");
+                TempData["success"] = "Edit success";
+                return RedirectToAction(nameof(Index));
             }
             return View();
         }
@@ -71,8 +71,8 @@ namespace ManageBooking.Web.Controllers
             {
                 _db.Villas.Remove(objFromDb);
                 _db.SaveChanges();
-                TempData["success"] = "Add success";
-                return RedirectToAction("Index");
+                TempData["success"] = "Delete success";
+                return RedirectToAction(nameof(Index));
             }
             return View();
         }
