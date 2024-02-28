@@ -1,4 +1,5 @@
-﻿using ManageBooking.Domain.Entities;
+﻿using ManageBooking.Application.Common.Interfaces;
+using ManageBooking.Domain.Entities;
 using ManageBooking.Infrastructure.Data;
 using ManageBooking.Web.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,14 @@ namespace ManageBooking.Web.Controllers
 {
     public class VillaNumberController : Controller
     {
-        private readonly ApplicationDbContext _db;
-        public VillaNumberController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+        public VillaNumberController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            var villaNumbers = _db.VillaNumbers.Include(u => u.Villa).ToList();
+            var villaNumbers = _unitOfWork.VillaNumber.GetAll(includeProperties: "Villa");
             return View(villaNumbers);
         }
 
@@ -25,7 +26,7 @@ namespace ManageBooking.Web.Controllers
         {
             VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _db.Villas.ToList().Select(x => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
                 {
                     Text = x.Name,
                     Value = x.Id.ToString()
@@ -37,11 +38,11 @@ namespace ManageBooking.Web.Controllers
         [HttpPost]
         public IActionResult Create(VillaNumberVM obj)
         {
-            bool roomNumberExists = _db.VillaNumbers.Any(x => x.Villa_Number == obj.VillaNumber.Villa_Number);
+            bool roomNumberExists = _unitOfWork.VillaNumber.Any(x => x.Villa_Number == obj.VillaNumber.Villa_Number);
             if (ModelState.IsValid && !roomNumberExists)
             {
-                _db.VillaNumbers.Add(obj.VillaNumber);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Add(obj.VillaNumber);
+                _unitOfWork.VillaNumber.Save();
                 TempData["success"] = "Add success";
                 return RedirectToAction(nameof(Index));
             }
@@ -51,7 +52,7 @@ namespace ManageBooking.Web.Controllers
                 TempData["error"] = "The villa number already exists.";
             }
 
-            obj.VillaList = _db.Villas.ToList().Select(x => new SelectListItem
+            obj.VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
             {
                 Text = x.Name,
                 Value = x.Id.ToString()
@@ -64,12 +65,12 @@ namespace ManageBooking.Web.Controllers
         {
             VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _db.Villas.ToList().Select(x => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
                 {
                     Text = x.Name,
                     Value = x.Id.ToString()
                 }),
-                VillaNumber = _db.VillaNumbers.FirstOrDefault(x => x.Villa_Number == villaNumberId),
+                VillaNumber = _unitOfWork.VillaNumber.Get(x => x.Villa_Number == villaNumberId),
             };
             if (villaNumberVM.VillaNumber is null) return RedirectToAction("Error", "Home");
             return View(villaNumberVM);
@@ -80,13 +81,13 @@ namespace ManageBooking.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Update(villaNumberVM.VillaNumber);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Update(villaNumberVM.VillaNumber);
+                _unitOfWork.VillaNumber.Save();
                 TempData["success"] = "Update success";
                 return RedirectToAction(nameof(Index));
             }
 
-            villaNumberVM.VillaList = _db.Villas.ToList().Select(x => new SelectListItem
+            villaNumberVM.VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
             {
                 Text = x.Name,
                 Value = x.Id.ToString()
@@ -99,12 +100,12 @@ namespace ManageBooking.Web.Controllers
         {
             VillaNumberVM villaNumberVM = new()
             {
-                VillaList = _db.Villas.ToList().Select(x => new SelectListItem
+                VillaList = _unitOfWork.Villa.GetAll().Select(x => new SelectListItem
                 {
                     Text = x.Name,
                     Value = x.Id.ToString()
                 }),
-                VillaNumber = _db.VillaNumbers.FirstOrDefault(x => x.Villa_Number == villaNumberId),
+                VillaNumber = _unitOfWork.VillaNumber.Get(x => x.Villa_Number == villaNumberId),
             };
             if (villaNumberVM is null) return RedirectToAction("Error", "Home");
             return View(villaNumberVM);
@@ -113,11 +114,11 @@ namespace ManageBooking.Web.Controllers
         [HttpPost]
         public IActionResult Delete(VillaNumberVM villaNumberVM)
         {
-            VillaNumber? objFromDb = _db.VillaNumbers.FirstOrDefault(x => x.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
+            VillaNumber? objFromDb = _unitOfWork.VillaNumber.Get(x => x.Villa_Number == villaNumberVM.VillaNumber.Villa_Number);
             if (objFromDb is not null)
             {
-                _db.VillaNumbers.Remove(objFromDb);
-                _db.SaveChanges();
+                _unitOfWork.VillaNumber.Remove(objFromDb);
+                _unitOfWork.VillaNumber.Save();
                 TempData["success"] = "Delete success";
                 return RedirectToAction(nameof(Index));
             }
