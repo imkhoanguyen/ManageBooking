@@ -9,9 +9,12 @@ namespace ManageBooking.Web.Controllers
     public class VillaController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public VillaController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public VillaController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
+
         }
         public IActionResult Index()
         {
@@ -29,6 +32,19 @@ namespace ManageBooking.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (obj.Image is not null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(obj.Image.FileName);
+                    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, @"images\VillaImage");
+
+                    using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
+                    obj.Image.CopyTo(fileStream);
+                    obj.ImageUrl = @"\images\VillaImage\" + fileName;
+                }
+                else
+                {
+                    obj.ImageUrl = "https://placehold.co/600x400";
+                }
                 _unitOfWork.Villa.Add(obj);
                 _unitOfWork.Villa.Save();
                 TempData["success"] = "Add success";
@@ -50,6 +66,29 @@ namespace ManageBooking.Web.Controllers
         {
             if (ModelState.IsValid && obj.Id > 0)
             {
+                if (obj.Image is not null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(obj.Image.FileName);
+                    string imagePath = Path.Combine(_webHostEnvironment.WebRootPath, @"images\VillaImage");
+
+
+                    //delete img
+                    if (!string.IsNullOrEmpty(obj.ImageUrl))
+                    {
+                       var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\'));
+                        if(System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+
+                    using var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create);
+                    obj.Image.CopyTo(fileStream);
+                    obj.ImageUrl = @"\images\VillaImage\" + fileName;
+                }
+                
+
                 _unitOfWork.Villa.Update(obj);
                 _unitOfWork.Villa.Save();
                 TempData["success"] = "Edit success";
@@ -69,8 +108,18 @@ namespace ManageBooking.Web.Controllers
         public IActionResult Delete(Villa obj)
         {
             Villa? objFromDb = _unitOfWork.Villa.Get(x => x.Id == obj.Id);
-            if(objFromDb is not null)
+            if (objFromDb is not null)
             {
+
+                if (!string.IsNullOrEmpty(objFromDb.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, objFromDb.ImageUrl.TrimStart('\\'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
                 _unitOfWork.Villa.Remove(objFromDb);
                 _unitOfWork.Villa.Save();
                 TempData["success"] = "Delete success";
