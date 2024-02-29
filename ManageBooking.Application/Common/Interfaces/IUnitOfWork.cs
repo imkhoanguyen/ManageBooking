@@ -10,5 +10,6 @@ namespace ManageBooking.Application.Common.Interfaces
     {
         IVillaRepository Villa { get; }
         IVillaNumberRepository VillaNumber { get; }
+        IAmenityRepository Amenity { get; }
     }
 }
