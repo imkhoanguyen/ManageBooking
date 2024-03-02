@@ -2,10 +2,12 @@
 using ManageBooking.Domain.Entities;
 using ManageBooking.Infrastructure.Data;
 using ManageBooking.Infrastructure.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ManageBooking.Web.Controllers
 {
+    [Authorize]
     public class VillaController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

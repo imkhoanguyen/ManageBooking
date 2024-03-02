@@ -26,9 +26,9 @@ namespace ManageBooking.Web.Controllers
             _signInManager = signInManager;
         }
 
-        public IActionResult Login(string returnUrl  = null)
+        public IActionResult Login(string returnUrl = null)
         {
-            returnUrl??=Url.Content("~/");
+            returnUrl ??= Url.Content("~/");
             LoginVM loginVM = new()
             {
                 RedirectUrl = returnUrl,
@@ -36,9 +36,21 @@ namespace ManageBooking.Web.Controllers
             return View(loginVM);
         }
 
-        public IActionResult Register()
+        public async Task<IActionResult> Logout()
         {
-            if(!_roleManager.RoleExistsAsync(SD.Role_Admin).GetAwaiter().GetResult())
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+        public IActionResult Register(string returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/");
+            if (!_roleManager.RoleExistsAsync(SD.Role_Admin).GetAwaiter().GetResult())
             {
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).Wait();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).Wait();
@@ -50,9 +62,99 @@ namespace ManageBooking.Web.Controllers
                 {
                     Text = x.Name,
                     Value = x.Name,
-                })
+                }),
+                RedirectUrl = returnUrl,
             };
             return View(registerVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterVM registerVM)
+        {
+            if (ModelState.IsValid)
+            {
+                // create user
+                ApplicationUser user = new()
+                {
+                    Name = registerVM.Name,
+                    Email = registerVM.Email,
+                    PhoneNumber = registerVM.PhoneNumber,
+                    NormalizedEmail = registerVM.Email.ToUpper(),
+                    EmailConfirmed = true,
+                    UserName = registerVM.Email,
+                    CreatedAt = DateTime.Now
+                };
+
+                // save user to db
+                var result = await _userManager.CreateAsync(user, registerVM.Password);
+                // save success
+                if (result.Succeeded)
+                {
+                    //  have role
+                    if (!string.IsNullOrEmpty(registerVM.Role))
+                    {
+                        // add role admin to user
+                        await _userManager.AddToRoleAsync(user, registerVM.Role);
+                    }
+                    else // dont have role
+                    {
+                        // add role customer to user
+                        await _userManager.AddToRoleAsync(user, SD.Role_Customer);
+                    }
+
+                    // add cookie
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    // return url
+                    if (string.IsNullOrEmpty(registerVM.RedirectUrl))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        return LocalRedirect(registerVM.RedirectUrl);
+                    }
+                }
+
+                // add error 
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            // create rolelist
+            registerVM.RoleList = _roleManager.Roles.Select(x => new SelectListItem
+            {
+                Text = x.Name,
+                Value = x.Name,
+            });
+
+            return View(registerVM);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginVM loginVM)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    if (string.IsNullOrEmpty(loginVM.RedirectUrl))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        return LocalRedirect(loginVM.RedirectUrl);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                }
+            }
+            return View(loginVM);
         }
     }
 }

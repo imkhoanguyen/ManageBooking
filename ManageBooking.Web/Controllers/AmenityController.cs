@@ -1,11 +1,14 @@
 ﻿using ManageBooking.Application.Common.Interfaces;
+using ManageBooking.Application.Common.Ultility;
 using ManageBooking.Domain.Entities;
 using ManageBooking.Web.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ManageBooking.Web.Controllers
 {
+    [Authorize(Roles = SD.Role_Admin)]
     public class AmenityController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
