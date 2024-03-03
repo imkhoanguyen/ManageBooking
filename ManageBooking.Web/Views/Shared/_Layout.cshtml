@@ -14,6 +14,7 @@
           integrity="sha512-vKMx8UnXk60zUwyUnUPM3HbQo8QfmNx7+ltw8Pm5zLusl1XIfwcxo8DbWCqMGKaWeNxWA8yrx5v3SaVpMvR3CA=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/ManageBooking.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/spinner.css"/>
 </head>
 
 <body>
@@ -51,13 +52,14 @@
                             </ul>
                         </li>
                     </ul>
-                    <partial name="_LoginPartial" />
+                    <partial name="_LoginPartial"/>
                 </div>
             </div>
         </nav>
     </header>
     <div class="">
         <main role="main">
+            <div class="loading spinner" style="display:none;"></div>
             <partial name="_Notification" />
             @RenderBody()
         </main>
