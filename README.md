@@ -1,3 +1,3 @@
-<h1>Simple project to learn Clean Architecture in .NET Core MVC</h1>
+<h1>Learn how to build Web API and MVC in the same project</h1>
 <hr>
 Buidding....
