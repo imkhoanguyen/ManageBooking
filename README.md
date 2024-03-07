@@ -1,2 +1,3 @@
 <h1>Simple project to learn Clean Architecture in .NET Core MVC</h1>
+<hr>
 Buidding....
