@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\booking.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,6 +25,10 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\VillaImage\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\booking.js" />
   </ItemGroup>
 
 </Project>
