@@ -27,7 +27,7 @@ namespace ManageBooking.Infrastructure.Repository
             _db.Bookings.Update(entity);
         }
 
-        public void UpdateStatus(int bookingId, string bookingStatus)
+        public void UpdateStatus(int bookingId, string bookingStatus, int villaNumber = 0)
         {
             Booking bookingFromDb = _db.Bookings.FirstOrDefault(u=>u.Id == bookingId);
             if (bookingFromDb is not null)
@@ -35,6 +35,7 @@ namespace ManageBooking.Infrastructure.Repository
                 bookingFromDb.Status = bookingStatus;
                 if(bookingFromDb.Status == SD.StatusCheckedIn)
                 {
+                    bookingFromDb.VillaNumber = villaNumber;
                     bookingFromDb.ActualCheckInDate = DateTime.Now;
                 }
                 if(bookingFromDb.Status == SD.StatusCompleted)
