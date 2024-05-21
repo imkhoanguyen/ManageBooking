@@ -1,6 +1,6 @@
 ﻿namespace ManageBooking.Web.ViewModel
 {
-    public class LineChartVM
+    public class LineChartDto
     {
         public List<ChartData> Series { get; set; }
         public string[] Categories { get; set; }

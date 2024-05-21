@@ -1,4 +1,6 @@
 using ManageBooking.Application.Common.Interfaces;
+using ManageBooking.Application.Services.Implementation;
+using ManageBooking.Application.Services.Interface;
 using ManageBooking.Domain.Entities;
 using ManageBooking.Infrastructure.Data;
 using ManageBooking.Infrastructure.Repository;
@@ -16,7 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddIdentity<ApplicationUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 // ghi de duong dan
 builder.Services.ConfigureApplicationCookie(option =>
 {
@@ -50,8 +52,19 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+SeedDatabase();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
